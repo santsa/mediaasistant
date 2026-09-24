@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: mediaassistant-db
+    environment:
+      POSTGRES_DB: mediaassistant
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - mediaassistant-data:/var/lib/postgresql/data
+volumes:
+  mediaassistant-data:
