@@ -1,6 +1,8 @@
 package com.santsa.mediaassistant.chat;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
+
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +22,14 @@ public class ChatController {
         return chatClient
                 .prompt(prompt)
                 .call()
+                .content();     
+    }
+
+    @PostMapping(value = "/stream", produces = "text/event-stream; charset=UTF-8")
+    public Flux<String> stream(@RequestBody String prompt) {
+        return chatClient
+                .prompt(prompt)
+                .stream()
                 .content();     
     }
 
