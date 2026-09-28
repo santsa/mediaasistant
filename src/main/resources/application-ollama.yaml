@@ -1,0 +1,11 @@
+spring:
+  autoconfigure:
+    exclude:
+    - org.springframework.ai.model.google.genai.autoconfigure.chat.GoogleGenAIChatAutoConfiguration
+  ai:
+    ollama:
+      base-url: https://ollama.com
+      api-key: ${OLLAMA_API_KEY}
+      chat:
+        model: qwen3.8:27b
+        
