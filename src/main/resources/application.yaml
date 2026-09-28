@@ -2,7 +2,9 @@ spring:
   application:
     name: mediaassistant
   profiles:
-    default: ollama
+    include:
+      - ollama
+      - gemini
   datasource:
     url: jdbc:postgresql://localhost:5432/mediaassistant
     username: postgres
