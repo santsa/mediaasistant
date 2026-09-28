@@ -3,7 +3,7 @@ spring:
     ollama:
       #base-url: http://localhost:11434
       base-url: https://ollama.com
-      #api-key: ${OLLAMA_API_KEY}
+      api-key: ${OLLAMA_API_KEY}
       chat:
         model: llama3.2:3b
         
