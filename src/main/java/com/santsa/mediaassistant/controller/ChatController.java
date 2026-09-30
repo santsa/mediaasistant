@@ -55,4 +55,10 @@ public class ChatController {
         return ResponseEntity.ok(assistantService.diagnoseWithReasoning(chatRequest.prompt(), chatRequest.model()));
     }
 
+    @PostMapping("/consult")
+    public ResponseEntity<String> consult(
+            @Valid @RequestBody ChatRequest chatRequest) {
+        return ResponseEntity.ok(assistantService.consult(chatRequest.prompt(), chatRequest.model()));
+    }
+
 }
