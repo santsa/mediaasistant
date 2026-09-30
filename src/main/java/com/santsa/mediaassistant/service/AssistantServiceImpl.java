@@ -24,11 +24,17 @@ public class AssistantServiceImpl implements AssistantService {
     @Value("classpath:prompts/explain-condition.st")
     private Resource explainConditionPrompt;
 
+    @Value ("classpath:prompts/symptoms-analysis.st")
+    private Resource symptomsAnalysisPrompt;
+
     private PromptTemplate explainConditionTemplate;
+
+    private PromptTemplate symptomsAnalysisTemplate;
 
     @PostConstruct 
     void init() {
         explainConditionTemplate = new PromptTemplate(explainConditionPrompt);
+        symptomsAnalysisTemplate = new PromptTemplate(symptomsAnalysisPrompt);
     }
 
     public AssistantServiceImpl(
@@ -67,6 +73,18 @@ public class AssistantServiceImpl implements AssistantService {
         log.info("Explaining condition: {} using model: {}", condition, model);
 
         String message = explainConditionTemplate.render(Map.of("condition", condition));
+
+        return resolveClient(model)
+                .prompt(message)
+                .call()
+                .content();
+    }
+
+    @Override
+    public String analyzeSymptoms(String symptoms, String model) {
+        log.info("Analyzing symptoms: {} using model: {}", symptoms, model);
+
+        String message = symptomsAnalysisTemplate.render(Map.of("symptoms", symptoms));
 
         return resolveClient(model)
                 .prompt(message)
