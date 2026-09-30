@@ -27,14 +27,20 @@ public class AssistantServiceImpl implements AssistantService {
     @Value ("classpath:prompts/symptoms-analysis.st")
     private Resource symptomsAnalysisPrompt;
 
+    @Value ("classpath:prompts/diagnosis-cot.st")
+    private Resource diagnosisWithReasoningPrompt;
+
     private PromptTemplate explainConditionTemplate;
 
     private PromptTemplate symptomsAnalysisTemplate;
+
+    private PromptTemplate diagnosisWithReasoningTemplate;
 
     @PostConstruct 
     void init() {
         explainConditionTemplate = new PromptTemplate(explainConditionPrompt);
         symptomsAnalysisTemplate = new PromptTemplate(symptomsAnalysisPrompt);
+        diagnosisWithReasoningTemplate = new PromptTemplate(diagnosisWithReasoningPrompt);
     }
 
     public AssistantServiceImpl(
@@ -85,6 +91,18 @@ public class AssistantServiceImpl implements AssistantService {
         log.info("Analyzing symptoms: {} using model: {}", symptoms, model);
 
         String message = symptomsAnalysisTemplate.render(Map.of("symptoms", symptoms));
+
+        return resolveClient(model)
+                .prompt(message)
+                .call()
+                .content();
+    }
+
+    @Override
+    public String diagnoseWithReasoning(String symptoms, String model) {
+        log.info("Diagnosing with reasoning for symptoms: {} using model: {}", symptoms, model);
+
+        String message = diagnosisWithReasoningTemplate.render(Map.of("symptoms", symptoms));
 
         return resolveClient(model)
                 .prompt(message)

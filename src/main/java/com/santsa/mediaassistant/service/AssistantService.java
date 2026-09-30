@@ -7,4 +7,5 @@ public interface AssistantService {
     Flux<String> chatStream(String prompt, String model);
     String explainCondtion(String condition, String model);
     String analyzeSymptoms(String symptoms, String model);
+    String diagnoseWithReasoning(String symptoms, String model);
 }
