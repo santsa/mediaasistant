@@ -42,4 +42,11 @@ public class ChatController {
             @Valid @RequestBody ChatRequest chatRequest) {
         return ResponseEntity.ok(assistantService.explainCondtion(chatRequest.prompt(), chatRequest.model()));
     }
+
+    @PostMapping("/symptoms")
+    public ResponseEntity<String> analyzeSymptoms(
+            @Valid @RequestBody ChatRequest chatRequest) {
+        return ResponseEntity.ok(assistantService.analyzeSymptoms(chatRequest.prompt(), chatRequest.model()));
+    }
+
 }
