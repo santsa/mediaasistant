@@ -24,11 +24,14 @@ public class AssistantServiceImpl implements AssistantService {
     @Value("classpath:prompts/explain-condition.st")
     private Resource explainConditionPrompt;
 
-    @Value ("classpath:prompts/symptoms-analysis.st")
+    @Value("classpath:prompts/symptoms-analysis.st")
     private Resource symptomsAnalysisPrompt;
 
-    @Value ("classpath:prompts/diagnosis-cot.st")
+    @Value("classpath:prompts/diagnosis-cot.st")
     private Resource diagnosisWithReasoningPrompt;
+
+    @Value("classpath:prompts/consult.st")
+    private Resource consultPrompt;
 
     private PromptTemplate explainConditionTemplate;
 
@@ -36,11 +39,14 @@ public class AssistantServiceImpl implements AssistantService {
 
     private PromptTemplate diagnosisWithReasoningTemplate;
 
-    @PostConstruct 
+    private PromptTemplate consultTemplate;
+
+    @PostConstruct
     void init() {
         explainConditionTemplate = new PromptTemplate(explainConditionPrompt);
         symptomsAnalysisTemplate = new PromptTemplate(symptomsAnalysisPrompt);
         diagnosisWithReasoningTemplate = new PromptTemplate(diagnosisWithReasoningPrompt);
+        consultTemplate = new PromptTemplate(consultPrompt);
     }
 
     public AssistantServiceImpl(
@@ -103,6 +109,18 @@ public class AssistantServiceImpl implements AssistantService {
         log.info("Diagnosing with reasoning for symptoms: {} using model: {}", symptoms, model);
 
         String message = diagnosisWithReasoningTemplate.render(Map.of("symptoms", symptoms));
+
+        return resolveClient(model)
+                .prompt(message)
+                .call()
+                .content();
+    }
+
+    @Override
+    public String consult(String query, String model) {
+        log.info("Consulting for query: {} using model: {}", query, model);
+
+        String message = consultTemplate.render(Map.of("query", query));
 
         return resolveClient(model)
                 .prompt(message)
