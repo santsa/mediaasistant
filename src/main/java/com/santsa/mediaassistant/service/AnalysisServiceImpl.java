@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.santsa.mediaassistant.config.ClientResolver;
 import com.santsa.mediaassistant.dto.analysis.ConditionSummary;
+import com.santsa.mediaassistant.dto.analysis.SymptomAnalysis;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AnaalysisServiceImpl implements AnaalysisService {
+public class AnalysisServiceImpl implements AnalysisService {
 
     private final ClientResolver clientResolver;
 
@@ -70,5 +71,15 @@ public class AnaalysisServiceImpl implements AnaalysisService {
                 .entity(new ParameterizedTypeReference<>() {
                 });
     }
+
+	@Override
+	public SymptomAnalysis analyzeSymptoms(String symptoms, String model) {
+		log.info("Analyzing symptoms: {} using model: {}", symptoms, model);
+		return clientResolver.resolve(model)
+				.prompt()
+				.user("Analyze the following symptoms and provide a detailed analysis: " + symptoms)
+				.call()
+				.entity(SymptomAnalysis.class);
+	}
 
 }

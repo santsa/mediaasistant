@@ -9,17 +9,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.santsa.mediaassistant.dto.analysis.ConditionSummary;
+import com.santsa.mediaassistant.dto.analysis.SymptomAnalysis;
 import com.santsa.mediaassistant.dto.ChatRequest;
-import com.santsa.mediaassistant.service.AnaalysisService;
+import com.santsa.mediaassistant.service.AnalysisService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/v1/analysis")
 @RequiredArgsConstructor
 public class AnalysisController {
 
-    private final AnaalysisService analysisService;
+    private final AnalysisService analysisService;
 
     @PostMapping("/condition")
     public ResponseEntity<ConditionSummary> analyzeCondition(
@@ -27,10 +30,16 @@ public class AnalysisController {
         return ResponseEntity.ok(analysisService.summarizeCondition(chatRequest.prompt(), chatRequest.model()));
     }
 
-        @PostMapping("/conditions")
+    @PostMapping("/conditions")
     public ResponseEntity<List<ConditionSummary>> listConditions(
             @RequestBody ChatRequest chatRequest) {
         return ResponseEntity.ok(analysisService.listRelatedConditions(chatRequest.prompt(), chatRequest.model()));
+    }
+
+    @PostMapping("/symptoms")
+    public ResponseEntity<SymptomAnalysis> analyzeSymptoms(
+            @RequestBody ChatRequest chatRequest) {
+        return ResponseEntity.ok(analysisService.analyzeSymptoms(chatRequest.prompt(), chatRequest.model()));
     }
 
 }
