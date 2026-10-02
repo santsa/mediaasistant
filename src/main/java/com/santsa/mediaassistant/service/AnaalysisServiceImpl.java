@@ -1,8 +1,11 @@
 package com.santsa.mediaassistant.service;
 
+import java.util.List;
+
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import com.santsa.mediaassistant.config.ClientResolver;
@@ -55,6 +58,17 @@ public class AnaalysisServiceImpl implements AnaalysisService {
          * .convert(jsonResponse);
          */
 
+    }
+
+    @Override
+    public List<ConditionSummary> listRelatedConditions(String symptoms, String model) {
+        log.info("Listing related conditions for symptoms: {} using model: {}", symptoms, model);
+        return clientResolver.resolve(model)
+                .prompt()
+                .user("List 3 related medical conditions for the following symptoms: " + symptoms)
+                .call()
+                .entity(new ParameterizedTypeReference<>() {
+                });
     }
 
 }

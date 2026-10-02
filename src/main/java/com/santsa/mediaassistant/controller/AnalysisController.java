@@ -1,5 +1,7 @@
 package com.santsa.mediaassistant.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +25,12 @@ public class AnalysisController {
     public ResponseEntity<ConditionSummary> analyzeCondition(
             @RequestBody ChatRequest chatRequest) {
         return ResponseEntity.ok(analysisService.summarizeCondition(chatRequest.prompt(), chatRequest.model()));
+    }
+
+        @PostMapping("/conditions")
+    public ResponseEntity<List<ConditionSummary>> listConditions(
+            @RequestBody ChatRequest chatRequest) {
+        return ResponseEntity.ok(analysisService.listRelatedConditions(chatRequest.prompt(), chatRequest.model()));
     }
 
 }
