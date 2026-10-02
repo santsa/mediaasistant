@@ -28,7 +28,14 @@ public class AnaalysisServiceImpl implements AnaalysisService {
 
         log.info("Summarizing condition: {} using model: {}", condition, model);
 
-        var converter = new BeanOutputConverter<>(ConditionSummary.class);
+        return resolveClient(model)
+        .prompt()
+        .user("Give me a education medical resum about the following condition: " + condition)
+        .call()
+        .entity(ConditionSummary.class);
+        
+
+        /*var converter = new BeanOutputConverter<>(ConditionSummary.class);
         String format = converter.getFormat();
         log.info("Using format: {}", format);
 
@@ -47,7 +54,7 @@ public class AnaalysisServiceImpl implements AnaalysisService {
         log.info("Received response: {}", jsonResponse);
 
         return converter
-                .convert(jsonResponse);
+                .convert(jsonResponse);*/
 
     }
 
