@@ -1,17 +1,19 @@
 package com.santsa.mediaassistant.service;
 
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.converter.BeanOutputConverter;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import com.santsa.mediaassistant.config.ClientResolver;
 import com.santsa.mediaassistant.dto.analysis.ConditionSummary;
 import com.santsa.mediaassistant.dto.analysis.SymptomAnalysis;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,6 +23,16 @@ import lombok.extern.slf4j.Slf4j;
 public class AnalysisServiceImpl implements AnalysisService {
 
     private final ClientResolver clientResolver;
+
+    @Value("classpath:prompts/structured-analysis.st")
+    private Resource structuredAnalysisPrompt;
+
+    private PromptTemplate structuredAnalysisTemplate;
+
+    @PostConstruct
+    void init() {
+        structuredAnalysisTemplate = new PromptTemplate(structuredAnalysisPrompt);
+    }
 
     @Override
     public ConditionSummary summarizeCondition(String condition, String model) {
@@ -75,9 +87,12 @@ public class AnalysisServiceImpl implements AnalysisService {
 	@Override
 	public SymptomAnalysis analyzeSymptoms(String symptoms, String model) {
 		log.info("Analyzing symptoms: {} using model: {}", symptoms, model);
+
+        String message = structuredAnalysisTemplate.render(Map.of("symptoms", symptoms));
+
 		return clientResolver.resolve(model)
 				.prompt()
-				.user("Analyze the following symptoms and provide a detailed analysis: " + symptoms)
+				.user(message)
 				.call()
 				.entity(SymptomAnalysis.class);
 	}
