@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.santsa.mediaassistant.config.ClientResolver;
 import com.santsa.mediaassistant.dto.analysis.ConditionSummary;
+import com.santsa.mediaassistant.dto.analysis.QueryClassification;
 import com.santsa.mediaassistant.dto.analysis.SymptomAnalysis;
 
 import jakarta.annotation.PostConstruct;
@@ -84,17 +85,33 @@ public class AnalysisServiceImpl implements AnalysisService {
                 });
     }
 
-	@Override
-	public SymptomAnalysis analyzeSymptoms(String symptoms, String model) {
-		log.info("Analyzing symptoms: {} using model: {}", symptoms, model);
+    @Override
+    public SymptomAnalysis analyzeSymptoms(String symptoms, String model) {
+        log.info("Analyzing symptoms: {} using model: {}", symptoms, model);
 
         String message = structuredAnalysisTemplate.render(Map.of("symptoms", symptoms));
 
-		return clientResolver.resolve(model)
-				.prompt()
-				.user(message)
-				.call()
-				.entity(SymptomAnalysis.class);
-	}
+        return clientResolver.resolve(model)
+                .prompt()
+                .user(message)
+                .call()
+                .entity(SymptomAnalysis.class);
+    }
+
+    @Override
+    public QueryClassification classifyQuery(String query, String model) {
+        log.info("Classification of query - moedl: {}", model);
+
+        return clientResolver.resolve(model)
+                .prompt()
+                .user("Classify the following query of patient. " +
+                        "Determine type of query: symptom report, general question, emergency, prescription request, or off-topic."
+                        +
+                        "Provide a brief explanation of the classification result, providing context or reasoning behind the classification. "
+                        +
+                        "Query: " + query)
+                .call()
+                .entity(QueryClassification.class);
+    }
 
 }

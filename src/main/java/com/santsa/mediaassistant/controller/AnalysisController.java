@@ -9,13 +9,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.santsa.mediaassistant.dto.analysis.ConditionSummary;
+import com.santsa.mediaassistant.dto.analysis.QueryClassification;
 import com.santsa.mediaassistant.dto.analysis.SymptomAnalysis;
 import com.santsa.mediaassistant.dto.ChatRequest;
 import com.santsa.mediaassistant.service.AnalysisService;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/v1/analysis")
@@ -40,6 +39,12 @@ public class AnalysisController {
     public ResponseEntity<SymptomAnalysis> analyzeSymptoms(
             @RequestBody ChatRequest chatRequest) {
         return ResponseEntity.ok(analysisService.analyzeSymptoms(chatRequest.prompt(), chatRequest.model()));
+    }
+
+    @PostMapping("/classify")
+    public ResponseEntity<QueryClassification> classify(
+            @RequestBody ChatRequest chatRequest) {
+        return ResponseEntity.ok(analysisService.classifyQuery(chatRequest.prompt(), chatRequest.model()));
     }
 
 }
