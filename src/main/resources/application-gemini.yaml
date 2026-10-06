@@ -6,7 +6,6 @@ spring:
         chat:
           options:
             model: gemini-3.1-flash-lite
-            temperature: 0.7
-            maxOutputTokens: 1024
-            topP: 0.8
-            topK: 40
+            temperature: 0.4
+            maxOutputTokens: 2048
+            top-p: 0.85
