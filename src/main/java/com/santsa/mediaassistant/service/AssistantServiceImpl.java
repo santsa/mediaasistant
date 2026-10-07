@@ -8,6 +8,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import com.santsa.mediaassistant.config.ClientResolver;
+import com.santsa.mediaassistant.tools.AppointmentSearchTool;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

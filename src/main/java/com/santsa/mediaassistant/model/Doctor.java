@@ -21,12 +21,15 @@ public class Doctor {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "specialty")
     private String specialty;
 
     @Column(name = "license_number")
     private String licenseNumber;
 
+    @Column(name = "phone")
     private String phone;
 
+    @Column(name = "office")
     private String office;
 }

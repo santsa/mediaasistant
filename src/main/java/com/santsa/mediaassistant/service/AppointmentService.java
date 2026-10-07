@@ -25,7 +25,7 @@ public class AppointmentService {
     private final DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
 
-    public List<AppointmentInfo> getAppointmentsBySpecialty(String specialty, LocalDate date) {
+    public List<AppointmentInfo> findAvailableAppointments(String specialty, LocalDate date) {
         log.info("Fetching appointments for specialty: {} on date: {}", specialty, date);
 
         var doctors = doctorRepository.findBySpecialtyIgnoreCase(specialty);
