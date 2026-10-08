@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.List;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.google.genai.GoogleGenAiChatModel;
@@ -18,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 
 import com.santsa.mediaassistant.tools.AppointmentSearchTool;
 import com.santsa.mediaassistant.tools.DoctorInfoTool;
+import com.santsa.mediaassistant.tools.PatientInfoTool;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +33,7 @@ public class AssistantConfig {
 
     private final AppointmentSearchTool appointmentSearchTool;
     private final DoctorInfoTool doctorInfoTool;
+    private final PatientInfoTool patientInfoTool;
 
     @Bean("geminiClient")
     ChatClient geminiClient(GoogleGenAiChatModel chatModel) throws IOException {
@@ -42,7 +43,7 @@ public class AssistantConfig {
 
         return ChatClient.builder(chatModel)
                 .defaultSystem(systemPrompt)
-                .defaultTools(appointmentSearchTool, doctorInfoTool)
+                .defaultTools(appointmentSearchTool, doctorInfoTool, patientInfoTool)
                 .build();
     }
 
@@ -66,7 +67,7 @@ public class AssistantConfig {
 
         return ChatClient.builder(chatModel)
                 .defaultSystem(systemPrompt)
-                .defaultTools(appointmentSearchTool, doctorInfoTool)
+                .defaultTools(appointmentSearchTool, doctorInfoTool, patientInfoTool)
                 .build();
     }
 
