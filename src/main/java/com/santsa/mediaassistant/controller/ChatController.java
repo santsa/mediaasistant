@@ -2,7 +2,6 @@ package com.santsa.mediaassistant.controller;
 
 import reactor.core.publisher.Flux;
 
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -25,8 +25,9 @@ public class ChatController {
 
     @PostMapping("/chat")
     public ResponseEntity<String> chat(
-            @RequestBody ChatRequest chatRequest) {
-        return ResponseEntity.ok(assistantService.chat(chatRequest.prompt(), chatRequest.model()));
+            @RequestBody ChatRequest chatRequest,
+            @RequestHeader(value = "X-User-Id", defaultValue = "1") Long userId) {
+        return ResponseEntity.ok(assistantService.chat(chatRequest.prompt(), chatRequest.model(), userId));
     }
 
     @PostMapping(value = "/stream", produces = "text/event-stream; charset=UTF-8")

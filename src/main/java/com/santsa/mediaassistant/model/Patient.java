@@ -26,8 +26,9 @@ public class Patient {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
+    @Column(name = "allergies")
     private String allergies;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "conditions")
     private String conditions;
 }

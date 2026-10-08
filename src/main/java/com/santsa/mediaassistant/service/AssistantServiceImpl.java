@@ -8,7 +8,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import com.santsa.mediaassistant.config.ClientResolver;
-import com.santsa.mediaassistant.tools.AppointmentSearchTool;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -51,11 +50,12 @@ public class AssistantServiceImpl implements AssistantService {
     }
 
     @Override
-    public String chat(String prompt, String model) {
+    public String chat(String prompt, String model, Long userId) {
         log.info("Chat with model: {} and prompt: {}", model, prompt);
 
         return clientResolver.resolve(model)
                 .prompt(prompt)
+                .toolContext(Map.of("userId", userId))
                 .call()
                 .content();
     }
