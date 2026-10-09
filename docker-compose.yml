@@ -1,5 +1,5 @@
 services:
-  postgres:
+  postgres-app:
     image: postgres:17
     container_name: mediaassistant-db
     environment:
@@ -9,7 +9,32 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - mediaassistant-data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
       - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - medassistant-net
+
+  keycloak:
+    image: keycloak/keycloak:26.2.5
+    container_name: medassistant-keycloak
+    command: start-dev --import-realm
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_PROXY_HEADERS: "xforwarded"
+    ports:
+      - "8090:8080"
+    volumes:
+      - ./keycloak_data:/opt/keycloak/data/
+    networks:
+      - medassistant-net
+
 volumes:
   mediaassistant-data:
+
+networks:
+  medassistant-net:
+    driver: bridge
