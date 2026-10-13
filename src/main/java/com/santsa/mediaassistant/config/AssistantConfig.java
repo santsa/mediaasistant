@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 
 import com.santsa.mediaassistant.tools.AppointmentSearchTool;
 import com.santsa.mediaassistant.tools.DoctorInfoTool;
+import com.santsa.mediaassistant.tools.DrugInfoTool;
 import com.santsa.mediaassistant.tools.PatientInfoTool;
 
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class AssistantConfig {
     private final AppointmentSearchTool appointmentSearchTool;
     private final DoctorInfoTool doctorInfoTool;
     private final PatientInfoTool patientInfoTool;
+    private final DrugInfoTool drugInfoTool;
 
     @Bean("geminiClient")
     ChatClient geminiClient(GoogleGenAiChatModel chatModel) throws IOException {
@@ -43,7 +45,7 @@ public class AssistantConfig {
 
         return ChatClient.builder(chatModel)
                 .defaultSystem(systemPrompt)
-                .defaultTools(appointmentSearchTool, doctorInfoTool, patientInfoTool)
+                .defaultTools(appointmentSearchTool, doctorInfoTool, patientInfoTool, drugInfoTool)
                 .build();
     }
 
@@ -67,7 +69,7 @@ public class AssistantConfig {
 
         return ChatClient.builder(chatModel)
                 .defaultSystem(systemPrompt)
-                .defaultTools(appointmentSearchTool, doctorInfoTool, patientInfoTool)
+                .defaultTools(appointmentSearchTool, doctorInfoTool, patientInfoTool, drugInfoTool)
                 .build();
     }
 

@@ -23,7 +23,7 @@ public class AppointmentSearchTool {
     public List<AppointmentInfo> searchAppointments(
             @ToolParam(description = "The medical speciality to search for example: cardiology, neurology, pediatrics") String speciality,
             @ToolParam(description = "The date to search for") String date) {
-        log.info("Searching appointments for speciality: {} and date: {}", speciality, date);
+        log.info("Invoqued Searching appointments: for speciality: {} and date: {}", speciality, date);
         return appointmentService.findAvailableAppointments(speciality, LocalDate.parse(date));
     }
 

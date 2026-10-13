@@ -22,7 +22,7 @@ public class PatientInfoTool {
     public PatientInfo getPatientInfo(
             @ToolParam(description = "The unique identifier of the patient whose information is to be retrieved.") Long patientId,
             ToolContext context) {
-        log.info("Fetching patient info for patientId: {}", patientId);
+        log.info("Invoqued getPatientInfo: Fetching patient info for patientId: {}", patientId);
 
         Long userId = (Long) context.getContext().get("userId");
         log.info("ToolContext User ID: {}", userId);

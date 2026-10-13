@@ -22,7 +22,7 @@ public class DoctorInfoTool {
     "Using when user ask about doctors and their information or who attends a speciality.")
     public List<DoctorInfo> searchDoctors(
             @ToolParam(description = "Only the lastName of the doctor or specialty to search without title like Dr. or Dra.") String query) {
-        log.info("Searching doctors with query: {}", query);
+        log.info("Invoqued searchDoctors: Searching doctors with query: {}", query);
         return doctorService.searchDoctors(query);
     }
 }
