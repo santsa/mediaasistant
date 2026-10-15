@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 
+import com.santsa.mediaassistant.tools.AppointmentBookingTool;
 import com.santsa.mediaassistant.tools.AppointmentSearchTool;
 import com.santsa.mediaassistant.tools.DoctorInfoTool;
 import com.santsa.mediaassistant.tools.DrugInfoTool;
@@ -36,6 +37,7 @@ public class AssistantConfig {
     private final DoctorInfoTool doctorInfoTool;
     private final PatientInfoTool patientInfoTool;
     private final DrugInfoTool drugInfoTool;
+    private final AppointmentBookingTool appointmentBookingTool;
 
     @Bean("geminiClient")
     ChatClient geminiClient(GoogleGenAiChatModel chatModel) throws IOException {
@@ -45,7 +47,8 @@ public class AssistantConfig {
 
         return ChatClient.builder(chatModel)
                 .defaultSystem(systemPrompt)
-                .defaultTools(appointmentSearchTool, doctorInfoTool, patientInfoTool, drugInfoTool)
+                .defaultTools(appointmentSearchTool, doctorInfoTool,
+                        patientInfoTool, drugInfoTool, appointmentBookingTool)
                 .build();
     }
 
@@ -69,7 +72,8 @@ public class AssistantConfig {
 
         return ChatClient.builder(chatModel)
                 .defaultSystem(systemPrompt)
-                .defaultTools(appointmentSearchTool, doctorInfoTool, patientInfoTool, drugInfoTool)
+                .defaultTools(appointmentSearchTool, doctorInfoTool,
+                        patientInfoTool, drugInfoTool, appointmentBookingTool)
                 .build();
     }
 
