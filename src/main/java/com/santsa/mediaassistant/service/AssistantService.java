@@ -5,7 +5,7 @@ import reactor.core.publisher.Flux;
 public interface AssistantService {
     String chat(String prompt, String model, Long userId, String role);
 
-    Flux<String> chatStream(String prompt, String model);
+    Flux<String> chatStream(String prompt, String model, Long userId, String role);
 
     String explainCondtion(String condition, String model);
 
