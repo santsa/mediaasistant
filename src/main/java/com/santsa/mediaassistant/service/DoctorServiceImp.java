@@ -3,6 +3,7 @@ package com.santsa.mediaassistant.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.santsa.mediaassistant.dto.DoctorInfo;
 import com.santsa.mediaassistant.model.Doctor;
@@ -18,6 +19,7 @@ public class DoctorServiceImp implements DoctorService {
 
     private final DoctorRepository doctorRepository;
 
+    @Transactional(readOnly = true)
     @Override
     public List<DoctorInfo> searchDoctors(String query) {
         log.info("Searching doctors with query: {}", query);

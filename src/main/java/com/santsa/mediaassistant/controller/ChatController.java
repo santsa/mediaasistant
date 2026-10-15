@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import com.santsa.mediaassistant.dto.ChatRequest;
 import com.santsa.mediaassistant.service.AssistantService;
+import com.santsa.mediaassistant.util.SecurityUtils;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +25,16 @@ import org.springframework.security.oauth2.jwt.Jwt;
 public class ChatController {
 
     private final AssistantService assistantService;
+    private final SecurityUtils securityUtils;
 
     @PostMapping("/chat")
     public ResponseEntity<String> chat(
             @RequestBody ChatRequest chatRequest,
-            @AuthenticationPrincipal Jwt jwt) {
+            @AuthenticationPrincipal Jwt jwt,
+            Authentication authentication) {
         Long userId = jwt.getClaim("userId");
-        return ResponseEntity.ok(assistantService.chat(chatRequest.prompt(), chatRequest.model(), userId));
+        String role = securityUtils.extractRole(authentication);
+        return ResponseEntity.ok(assistantService.chat(chatRequest.prompt(), chatRequest.model(), userId, role));
     }
 
     @PostMapping(value = "/stream", produces = "text/event-stream; charset=UTF-8")

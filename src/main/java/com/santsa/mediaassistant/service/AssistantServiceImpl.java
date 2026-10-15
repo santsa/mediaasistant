@@ -50,12 +50,12 @@ public class AssistantServiceImpl implements AssistantService {
     }
 
     @Override
-    public String chat(String prompt, String model, Long userId) {
+    public String chat(String prompt, String model, Long userId, String role) {
         log.info("Chat with model: {} and prompt: {}", model, prompt);
 
         return clientResolver.resolve(model)
                 .prompt(prompt)
-                .toolContext(Map.of("userId", userId))
+                .toolContext(Map.of("userId", userId, "role", role))
                 .call()
                 .content();
     }

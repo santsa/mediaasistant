@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/v1/**").hasRole("PATIENT")
+                        .requestMatchers("/api/v1/**").hasAnyRole("PATIENT", "ADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
@@ -36,45 +36,41 @@ public class SecurityConfig {
                 .build();
     }
 
-@Bean
-public JwtAuthenticationConverter jwtAuthenticationConverter() {
-    JwtGrantedAuthoritiesConverter defaultAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-    JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter defaultAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
 
-    converter.setJwtGrantedAuthoritiesConverter(jwt -> {
-        // Inicializamos la lista mutable con los scopes por defecto
-        Collection<GrantedAuthority> authorities = new ArrayList<>(
-                Optional.ofNullable(defaultAuthoritiesConverter.convert(jwt)).orElse(List.of())
-        );
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            Collection<GrantedAuthority> authorities = new ArrayList<>(
+                    Optional.ofNullable(defaultAuthoritiesConverter.convert(jwt)).orElse(List.of()));
 
-        // 1. Extraer roles de cliente (medassistant-client)
-        Map<String, Object> resourceAccess = jwt.getClaimAsMap("resource_access");
-        if (resourceAccess != null && resourceAccess.get("medassistant-client") instanceof Map<?, ?> clientMap) {
-            authorities.addAll(extractRoles(clientMap));
-        }
+            // 1. Extract client roles (medassistant-client)
+            Map<String, Object> resourceAccess = jwt.getClaimAsMap("resource_access");
+            if (resourceAccess != null && resourceAccess.get("medassistant-client") instanceof Map<?, ?> clientMap) {
+                authorities.addAll(extractRoles(clientMap));
+            }
 
-        // 2. Extraer roles de realm globales
-        Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
-        if (realmAccess != null) {
-            authorities.addAll(extractRoles(realmAccess));
-        }
+            // 2. Extract global roles
+            Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
+            if (realmAccess != null) {
+                authorities.addAll(extractRoles(realmAccess));
+            }
 
-        return authorities;
-    });
+            return authorities;
+        });
 
-    return converter;
-}
-
-
-private List<SimpleGrantedAuthority> extractRoles(Map<?, ?> accessMap) {
-    if (accessMap.get("roles") instanceof List<?> rolesList) {
-        return rolesList.stream()
-                .filter(String.class::isInstance)
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                .toList();
+        return converter;
     }
-    return List.of();
-}
 
+    private List<SimpleGrantedAuthority> extractRoles(Map<?, ?> accessMap) {
+        if (accessMap.get("roles") instanceof List<?> rolesList) {
+            return rolesList.stream()
+                    .filter(String.class::isInstance)
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                    .toList();
+        }
+        return List.of();
+    }
 
 }

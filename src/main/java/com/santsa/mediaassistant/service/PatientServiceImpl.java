@@ -1,6 +1,7 @@
 package com.santsa.mediaassistant.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.santsa.mediaassistant.dto.PatientInfo;
 import com.santsa.mediaassistant.model.Patient;
@@ -16,6 +17,7 @@ public class PatientServiceImpl implements PatientService {
 
     private final PatientRepository patientRepository;
 
+    @Transactional(readOnly = true)
     @Override
     public PatientInfo getPatientInfo(Long patientId) {
         log.info("Fetching patient info for patientId: {}", patientId);
