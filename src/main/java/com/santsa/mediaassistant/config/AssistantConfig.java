@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.google.genai.GoogleGenAiChatModel;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.boot.restclient.RestClientCustomizer;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 
 import com.santsa.mediaassistant.tools.AppointmentBookingTool;
 import com.santsa.mediaassistant.tools.AppointmentSearchTool;
+import org.springframework.ai.chat.memory.ChatMemory;
 import com.santsa.mediaassistant.tools.DoctorInfoTool;
 import com.santsa.mediaassistant.tools.DrugInfoTool;
 import com.santsa.mediaassistant.tools.PatientInfoTool;
@@ -30,51 +32,54 @@ import org.springframework.core.io.Resource;
 @RequiredArgsConstructor
 public class AssistantConfig {
 
-    @Value("classpath:prompts/system-prompt.st")
-    private Resource systemPromptResource;
+        @Value("classpath:prompts/system-prompt.st")
+        private Resource systemPromptResource;
 
-    private final AppointmentSearchTool appointmentSearchTool;
-    private final DoctorInfoTool doctorInfoTool;
-    private final PatientInfoTool patientInfoTool;
-    private final DrugInfoTool drugInfoTool;
-    private final AppointmentBookingTool appointmentBookingTool;
+        private final AppointmentSearchTool appointmentSearchTool;
+        private final DoctorInfoTool doctorInfoTool;
+        private final PatientInfoTool patientInfoTool;
+        private final DrugInfoTool drugInfoTool;
+        private final AppointmentBookingTool appointmentBookingTool;
+        private final ChatMemory chatMemory;
 
-    @Bean("geminiClient")
-    ChatClient geminiClient(GoogleGenAiChatModel chatModel) throws IOException {
+        @Bean("geminiClient")
+        ChatClient geminiClient(GoogleGenAiChatModel chatModel) throws IOException {
 
-        String systemPrompt = systemPromptResource.getContentAsString(StandardCharsets.UTF_8)
-                .replace("{currentDate}", LocalDate.now().toString());
+                String systemPrompt = systemPromptResource.getContentAsString(StandardCharsets.UTF_8)
+                                .replace("{currentDate}", LocalDate.now().toString());
 
-        return ChatClient.builder(chatModel)
-                .defaultSystem(systemPrompt)
-                .defaultTools(appointmentSearchTool, doctorInfoTool,
-                        patientInfoTool, drugInfoTool, appointmentBookingTool)
-                .build();
-    }
+                return ChatClient.builder(chatModel)
+                                .defaultSystem(systemPrompt)
+                                .defaultTools(appointmentSearchTool, doctorInfoTool,
+                                                patientInfoTool, drugInfoTool, appointmentBookingTool)
+                                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+                                .build();
+        }
 
-    @Bean
-    @Profile("ollama")
-    RestClientCustomizer ollamaBearerToken(@Value("${spring.ai.ollama.api-key}") String apiKey) {
-        return builder -> builder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
-    }
+        @Bean
+        @Profile("ollama")
+        RestClientCustomizer ollamaBearerToken(@Value("${spring.ai.ollama.api-key}") String apiKey) {
+                return builder -> builder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
+        }
 
-    @Bean
-    @Profile("ollama")
-    WebClientCustomizer ollamaWebClientBearerToken(@Value("${spring.ai.ollama.api-key}") String apiKey) {
-        return builder -> builder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
-    }
+        @Bean
+        @Profile("ollama")
+        WebClientCustomizer ollamaWebClientBearerToken(@Value("${spring.ai.ollama.api-key}") String apiKey) {
+                return builder -> builder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
+        }
 
-    @Bean("ollamaClient")
-    ChatClient ollamaClient(OllamaChatModel chatModel) throws IOException {
+        @Bean("ollamaClient")
+        ChatClient ollamaClient(OllamaChatModel chatModel) throws IOException {
 
-        String systemPrompt = systemPromptResource.getContentAsString(StandardCharsets.UTF_8)
-                .replace("{currentDate}", LocalDate.now().toString());
+                String systemPrompt = systemPromptResource.getContentAsString(StandardCharsets.UTF_8)
+                                .replace("{currentDate}", LocalDate.now().toString());
 
-        return ChatClient.builder(chatModel)
-                .defaultSystem(systemPrompt)
-                .defaultTools(appointmentSearchTool, doctorInfoTool,
-                        patientInfoTool, drugInfoTool, appointmentBookingTool)
-                .build();
-    }
+                return ChatClient.builder(chatModel)
+                                .defaultSystem(systemPrompt)
+                                .defaultTools(appointmentSearchTool, doctorInfoTool,
+                                                patientInfoTool, drugInfoTool, appointmentBookingTool)
+                                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+                                .build();
+        }
 
 }

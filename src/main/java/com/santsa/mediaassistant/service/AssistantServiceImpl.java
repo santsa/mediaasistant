@@ -3,6 +3,7 @@ package com.santsa.mediaassistant.service;
 import java.util.Map;
 
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,7 @@ public class AssistantServiceImpl implements AssistantService {
         return clientResolver.resolve(model)
                 .prompt(prompt)
                 .toolContext(Map.of("userId", userId, "role", role))
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, String.valueOf(userId)))
                 .call()
                 .content();
     }
@@ -67,6 +69,7 @@ public class AssistantServiceImpl implements AssistantService {
         return clientResolver.resolve(model)
                 .prompt(prompt)
                 .toolContext(Map.of("userId", userId, "role", role))
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, String.valueOf(userId)))
                 .stream()
                 .content();
     }

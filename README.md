@@ -6,7 +6,7 @@ Media Assistant is a Spring Boot REST API for a medical-assistance prototype. It
 
 ## Technology
 
-- Java 21 and Spring Boot 4
+- Java 25 (LTS) and Spring Boot 4
 - Spring AI 2 with Google Gemini and Ollama chat clients
 - PostgreSQL 17 with Spring Data JPA
 - Keycloak JWT bearer-token authentication
@@ -14,7 +14,7 @@ Media Assistant is a Spring Boot REST API for a medical-assistance prototype. It
 
 ## Prerequisites
 
-- JDK 21
+- JDK 25
 - Docker and Docker Compose
 - API keys for both Google Gemini and Ollama
 - A configured Keycloak realm and client that issue tokens accepted by this API
