@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.google.genai.GoogleGenAiChatModel;
@@ -13,20 +14,42 @@ import org.springframework.boot.webclient.WebClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+
+import com.santsa.mediaassistant.tools.AppointmentBookingTool;
+import com.santsa.mediaassistant.tools.AppointmentSearchTool;
+import com.santsa.mediaassistant.tools.DoctorInfoTool;
+import com.santsa.mediaassistant.tools.DrugInfoTool;
+import com.santsa.mediaassistant.tools.PatientInfoTool;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 
 @Configuration
+@RequiredArgsConstructor
 public class AssistantConfig {
 
     @Value("classpath:prompts/system-prompt.st")
     private Resource systemPromptResource;
 
+    private final AppointmentSearchTool appointmentSearchTool;
+    private final DoctorInfoTool doctorInfoTool;
+    private final PatientInfoTool patientInfoTool;
+    private final DrugInfoTool drugInfoTool;
+    private final AppointmentBookingTool appointmentBookingTool;
+
     @Bean("geminiClient")
     ChatClient geminiClient(GoogleGenAiChatModel chatModel) throws IOException {
+
+        String systemPrompt = systemPromptResource.getContentAsString(StandardCharsets.UTF_8)
+                .replace("{currentDate}", LocalDate.now().toString());
+
         return ChatClient.builder(chatModel)
-        .defaultSystem(systemPromptResource.getContentAsString(StandardCharsets.UTF_8))
-        .build();
+                .defaultSystem(systemPrompt)
+                .defaultTools(appointmentSearchTool, doctorInfoTool,
+                        patientInfoTool, drugInfoTool, appointmentBookingTool)
+                .build();
     }
 
     @Bean
@@ -43,9 +66,15 @@ public class AssistantConfig {
 
     @Bean("ollamaClient")
     ChatClient ollamaClient(OllamaChatModel chatModel) throws IOException {
+
+        String systemPrompt = systemPromptResource.getContentAsString(StandardCharsets.UTF_8)
+                .replace("{currentDate}", LocalDate.now().toString());
+
         return ChatClient.builder(chatModel)
-        .defaultSystem(systemPromptResource.getContentAsString(StandardCharsets.UTF_8))
-        .build();
+                .defaultSystem(systemPrompt)
+                .defaultTools(appointmentSearchTool, doctorInfoTool,
+                        patientInfoTool, drugInfoTool, appointmentBookingTool)
+                .build();
     }
 
 }

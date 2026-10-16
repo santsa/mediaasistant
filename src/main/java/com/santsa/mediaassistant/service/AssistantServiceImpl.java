@@ -50,21 +50,23 @@ public class AssistantServiceImpl implements AssistantService {
     }
 
     @Override
-    public String chat(String prompt, String model) {
-        log.info("Chat with model: {} and prompt: {}", model, prompt);
+    public String chat(String prompt, String model, Long userId, String role) {
+        log.info("Chat with model: {} and prompt: {} with user: {} and role: {}", model, prompt, userId, role);
 
         return clientResolver.resolve(model)
                 .prompt(prompt)
+                .toolContext(Map.of("userId", userId, "role", role))
                 .call()
                 .content();
     }
 
     @Override
-    public Flux<String> chatStream(String prompt, String model) {
-        log.info("Chat Streaming with model: {} and prompt: {}", model, prompt);
+    public Flux<String> chatStream(String prompt, String model, Long userId, String role) {
+        log.info("Chat stream with model: {} and prompt: {} with user: {} and role: {}", model, prompt, userId, role);
 
         return clientResolver.resolve(model)
                 .prompt(prompt)
+                .toolContext(Map.of("userId", userId, "role", role))
                 .stream()
                 .content();
     }

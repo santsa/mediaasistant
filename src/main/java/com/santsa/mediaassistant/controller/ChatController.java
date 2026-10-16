@@ -2,19 +2,22 @@ package com.santsa.mediaassistant.controller;
 
 import reactor.core.publisher.Flux;
 
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import com.santsa.mediaassistant.dto.ChatRequest;
 import com.santsa.mediaassistant.service.AssistantService;
+import com.santsa.mediaassistant.util.SecurityUtils;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -22,17 +25,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class ChatController {
 
     private final AssistantService assistantService;
+    private final SecurityUtils securityUtils;
 
     @PostMapping("/chat")
     public ResponseEntity<String> chat(
-            @RequestBody ChatRequest chatRequest) {
-        return ResponseEntity.ok(assistantService.chat(chatRequest.prompt(), chatRequest.model()));
+            @RequestBody ChatRequest chatRequest,
+            @AuthenticationPrincipal Jwt jwt,
+            Authentication authentication) {
+        Long userId = jwt.getClaim("userId");
+        String role = securityUtils.extractRole(authentication);
+        return ResponseEntity.ok(assistantService.chat(chatRequest.prompt(), chatRequest.model(), userId, role));
     }
 
     @PostMapping(value = "/stream", produces = "text/event-stream; charset=UTF-8")
     public Flux<String> stream(
-            @RequestBody ChatRequest chatRequest) {
-        return assistantService.chatStream(chatRequest.prompt(), chatRequest.model());
+            @RequestBody ChatRequest chatRequest,
+            @AuthenticationPrincipal Jwt jwt,
+            Authentication authentication) {
+        Long userId = jwt.getClaim("userId");
+        String role = securityUtils.extractRole(authentication);
+        return assistantService.chatStream(chatRequest.prompt(), chatRequest.model(), userId, role);
     }
 
     @PostMapping("/explain")

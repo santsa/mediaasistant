@@ -12,3 +12,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://shiny-engine-46j44p99xp3jx46-8090.app.github.dev/realms/medassistant
+          #issuer-uri: http://localhost:8090/realms/medassistant
