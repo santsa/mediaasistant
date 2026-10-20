@@ -1,6 +1,5 @@
 package com.santsa.mediaassistant.exception;
 
-import java.time.DateTimeException;
 import java.time.format.DateTimeParseException;
 
 import org.springframework.http.HttpStatus;
