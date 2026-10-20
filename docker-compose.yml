@@ -32,8 +32,19 @@ services:
     networks:
       - medassistant-net
 
+  chroma:
+    image: chromadb/chroma
+    container_name: medassistant-chroma
+    ports:
+      - "8000:8000"
+    environment:
+      - IS_PERSISTENT=TRUE
+    volumes:
+      - ./chroma_data:/chroma/chroma      
+
 volumes:
-  mediaassistant-data:
+  mediaassistant-data:  
+  chroma_data:
 
 networks:
   medassistant-net:

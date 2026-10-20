@@ -24,3 +24,11 @@ spring:
         repository:
           jdbc:
             initialize-schema: always
+
+    vectorstore:
+      chroma:
+        client:
+          host: http://localhost
+          port: 8000
+        collection-name: medassistant
+        initialize-schema: true
