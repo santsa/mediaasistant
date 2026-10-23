@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
@@ -25,7 +24,6 @@ import org.springframework.http.HttpHeaders;
 
 import com.santsa.mediaassistant.tools.AppointmentBookingTool;
 import com.santsa.mediaassistant.tools.AppointmentSearchTool;
-import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chroma.vectorstore.ChromaApi;
 import org.springframework.ai.chroma.vectorstore.ChromaVectorStore;
 import org.springframework.ai.embedding.EmbeddingModel;
@@ -51,7 +49,6 @@ public class AssistantConfig {
         private final PatientInfoTool patientInfoTool;
         private final DrugInfoTool drugInfoTool;
         private final AppointmentBookingTool appointmentBookingTool;
-        private final ChatMemory chatMemory;
         private final MedicalAuditAdvisor medicalAuditAdvisor;
 
         @Bean("geminiClient")
@@ -91,8 +88,7 @@ public class AssistantConfig {
                                 .defaultTools(
                                                 appointmentSearchTool, doctorInfoTool, patientInfoTool,
                                                 drugInfoTool, appointmentBookingTool)
-                                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory)
-                                                .build(), medicalAuditAdvisor);
+                                .defaultAdvisors(medicalAuditAdvisor);
 
                 vectorStoreProvider.ifAvailable(vectorStore -> builder.defaultAdvisors(
                                 QuestionAnswerAdvisor.builder(vectorStore)

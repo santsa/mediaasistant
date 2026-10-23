@@ -49,26 +49,34 @@ public class ChatController {
 
     @PostMapping("/explain")
     public ResponseEntity<String> explainCondition(
-            @Valid @RequestBody ChatRequest chatRequest) {
-        return ResponseEntity.ok(assistantService.explainCondtion(chatRequest.prompt(), chatRequest.model()));
+            @Valid @RequestBody ChatRequest chatRequest,
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(
+                assistantService.explainCondtion(chatRequest.prompt(), chatRequest.model(), jwt.getClaim("userId")));
     }
 
     @PostMapping("/symptoms")
     public ResponseEntity<String> analyzeSymptoms(
-            @Valid @RequestBody ChatRequest chatRequest) {
-        return ResponseEntity.ok(assistantService.analyzeSymptoms(chatRequest.prompt(), chatRequest.model()));
+            @Valid @RequestBody ChatRequest chatRequest,
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(
+                assistantService.analyzeSymptoms(chatRequest.prompt(), chatRequest.model(), jwt.getClaim("userId")));
     }
 
     @PostMapping("/diagnose")
     public ResponseEntity<String> diagnoseWithReasoning(
-            @Valid @RequestBody ChatRequest chatRequest) {
-        return ResponseEntity.ok(assistantService.diagnoseWithReasoning(chatRequest.prompt(), chatRequest.model()));
+            @Valid @RequestBody ChatRequest chatRequest,
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(assistantService.diagnoseWithReasoning(chatRequest.prompt(), chatRequest.model(),
+                jwt.getClaim("userId")));
     }
 
     @PostMapping("/consult")
     public ResponseEntity<String> consult(
-            @Valid @RequestBody ChatRequest chatRequest) {
-        return ResponseEntity.ok(assistantService.consult(chatRequest.prompt(), chatRequest.model()));
+            @Valid @RequestBody ChatRequest chatRequest,
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity
+                .ok(assistantService.consult(chatRequest.prompt(), chatRequest.model(), jwt.getClaim("userId")));
     }
 
 }

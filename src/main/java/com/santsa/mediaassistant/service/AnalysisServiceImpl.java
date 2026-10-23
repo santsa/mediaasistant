@@ -3,6 +3,7 @@ package com.santsa.mediaassistant.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -36,49 +37,25 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
 
     @Override
-    public ConditionSummary summarizeCondition(String condition, String model) {
+    public ConditionSummary summarizeCondition(String condition, String model, Long userId) {
 
         log.info("Summarizing condition: {} using model: {}", condition, model);
 
         return clientResolver.resolve(model)
                 .prompt()
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, String.valueOf(userId)))
                 .user("Give me a education medical resum about the following condition: " + condition)
                 .call()
                 .entity(ConditionSummary.class);
 
-        /*
-         * var converter = new BeanOutputConverter<>(ConditionSummary.class);
-         * String format = converter.getFormat();
-         * log.info("Using format: {}", format);
-         * 
-         * String prompt = """
-         * Summarize the following medical condition in a concise manner, highlighting
-         * its key aspects, symptoms, and potential treatments.
-         * Return only one valid JSON object matching the format below. Do not add a
-         * preamble, markdown, emojis, or a footer.
-         * Write all string values in Spanish and do not include keys that are not in
-         * the format.
-         * Medical Condition: %s
-         * Format: %s
-         * """
-         * .formatted(condition, format);
-         * String jsonResponse = resolveClient(model)
-         * .prompt(prompt)
-         * .call()
-         * .content();
-         * log.info("Received response: {}", jsonResponse);
-         * 
-         * return converter
-         * .convert(jsonResponse);
-         */
-
     }
 
     @Override
-    public List<ConditionSummary> listRelatedConditions(String symptoms, String model) {
+    public List<ConditionSummary> listRelatedConditions(String symptoms, String model, Long userId) {
         log.info("Listing related conditions for symptoms: {} using model: {}", symptoms, model);
         return clientResolver.resolve(model)
                 .prompt()
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, String.valueOf(userId)))
                 .user("List 3 related medical conditions for the following symptoms: " + symptoms)
                 .call()
                 .entity(new ParameterizedTypeReference<>() {
@@ -86,24 +63,26 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
 
     @Override
-    public SymptomAnalysis analyzeSymptoms(String symptoms, String model) {
+    public SymptomAnalysis analyzeSymptoms(String symptoms, String model, Long userId) {
         log.info("Analyzing symptoms: {} using model: {}", symptoms, model);
 
         String message = structuredAnalysisTemplate.render(Map.of("symptoms", symptoms));
 
         return clientResolver.resolve(model)
                 .prompt()
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, String.valueOf(userId)))
                 .user(message)
                 .call()
                 .entity(SymptomAnalysis.class);
     }
 
     @Override
-    public QueryClassification classifyQuery(String query, String model) {
+    public QueryClassification classifyQuery(String query, String model, Long userId) {
         log.info("Classification of query - moedl: {}", model);
 
         return clientResolver.resolve(model)
                 .prompt()
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, String.valueOf(userId)))
                 .user("Classify the following query of patient. " +
                         "Determine type of query: symptom report, general question, emergency, prescription request, or off-topic."
                         +
