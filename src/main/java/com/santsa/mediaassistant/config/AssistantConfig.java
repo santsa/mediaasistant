@@ -52,6 +52,7 @@ public class AssistantConfig {
         private final DrugInfoTool drugInfoTool;
         private final AppointmentBookingTool appointmentBookingTool;
         private final ChatMemory chatMemory;
+        private final MedicalAuditAdvisor medicalAuditAdvisor;
 
         @Bean("geminiClient")
         ChatClient geminiClient(GoogleGenAiChatModel chatModel,
@@ -90,7 +91,8 @@ public class AssistantConfig {
                                 .defaultTools(
                                                 appointmentSearchTool, doctorInfoTool, patientInfoTool,
                                                 drugInfoTool, appointmentBookingTool)
-                                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build());
+                                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory)
+                                                .build(), medicalAuditAdvisor);
 
                 vectorStoreProvider.ifAvailable(vectorStore -> builder.defaultAdvisors(
                                 QuestionAnswerAdvisor.builder(vectorStore)
