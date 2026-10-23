@@ -1,0 +1,9 @@
+spring:
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      api-key: ""
+assistant:
+  ingestion:
+    ollama-enabled: true
+    gemini-enabled: true

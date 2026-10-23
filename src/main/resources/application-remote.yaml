@@ -1,0 +1,4 @@
+assistant:
+  ingestion:
+    ollama-enabled: false
+    gemini-enabled: true
