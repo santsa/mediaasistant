@@ -1,20 +1,36 @@
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.vectorstore.chroma.autoconfigure.ChromaVectorStoreAutoConfiguration
   application:
     name: mediaassistant
   profiles:
     include:
       - ollama
       - gemini
+      - remote
   datasource:
     url: jdbc:postgresql://localhost:5432/mediaassistant
     username: postgres
     password: postgres
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://shiny-engine-46j44p99xp3jx46-8090.app.github.dev/realms/medassistant
+          issuer-uri: https://expert-space-rotary-phone-rw4995vjg43xvgg-8090.app.github.dev/realms/medassistant
           #issuer-uri: http://localhost:8090/realms/medassistant
+  ai:
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: always
+
+    vectorstore:
+      chroma:
+        url: http://localhost:8000
+        #collection-name: medassistant
+        #initialize-schema: true

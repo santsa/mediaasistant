@@ -6,7 +6,7 @@ Media Assistant is a Spring Boot REST API for a medical-assistance prototype. It
 
 ## Technology
 
-- Java 21 and Spring Boot 4
+- Java 25 (LTS) and Spring Boot 4
 - Spring AI 2 with Google Gemini and Ollama chat clients
 - PostgreSQL 17 with Spring Data JPA
 - Keycloak JWT bearer-token authentication
@@ -14,12 +14,12 @@ Media Assistant is a Spring Boot REST API for a medical-assistance prototype. It
 
 ## Prerequisites
 
-- JDK 21
+- JDK 25
 - Docker and Docker Compose
-- API keys for both Google Gemini and Ollama
+- A Google Gemini API key; an Ollama API key is also required when using the remote Ollama endpoint
 - A configured Keycloak realm and client that issue tokens accepted by this API
 
-Both AI profiles are included by default, so both provider credentials must be set for the application to start. By default, requests use Gemini; set the request's `model` to `ollama` to use Ollama.
+Both AI providers are configured by default. The Google Gemini API key is used for embeddings in the default `remote` profile, so it is required in either profile. Remote Ollama chat also requires an Ollama API key. The default `remote` profile uses Gemini embeddings for both chat clients, avoiding a dependency on a reachable Ollama embedding endpoint in remote environments. Set the request's `model` to `ollama` to use Ollama chat. The `local` profile points Ollama to `http://localhost:11434`, uses local Ollama embeddings for Ollama chat, and does not require an Ollama API key.
 
 ## Run locally
 
@@ -43,13 +43,20 @@ Both AI profiles are included by default, so both provider credentials must be s
 
    ```sh
    export GOOGLE_GENAI_API_KEY=your-google-genai-api-key
-   export OLLAMA_API_KEY=your-ollama-api-key
    ```
+
+   For the default remote profile, also set `OLLAMA_API_KEY` for Ollama Cloud. For local mode, make sure Ollama is running and has the configured chat and embedding models available.
 
 4. Run the application:
 
    ```sh
    ./mvnw spring-boot:run
+   ```
+
+   The default profile is `remote`. To use local Ollama embeddings, activate the `local` profile:
+
+   ```sh
+   SPRING_PROFILES_ACTIVE=local ./mvnw spring-boot:run
    ```
 
    The API listens on port `8080` by default. To build and run the tests:
@@ -101,6 +108,6 @@ curl http://localhost:8080/api/v1/analysis/condition \
 ## Development notes
 
 - The application uses `jdbc:postgresql://localhost:5432/mediaassistant` by default; configure the datasource properties if your database differs.
-- Hibernate is configured with `ddl-auto: create-drop`. Database tables are recreated when the application starts and dropped when it stops, so this configuration is for disposable development data only.
-- On startup, the application seeds sample doctors, patients, and appointments. Do not treat this sample data as real patient information.
-- Gemini and Ollama model settings are in `src/main/resources/application-gemini.yaml` and `src/main/resources/application-ollama.yaml`. Chat requests use Gemini unless `model` is set to `ollama`.
+- Hibernate is configured with `ddl-auto: update`, so application restarts preserve the existing tables and their data. Docker Compose stores PostgreSQL files in `./postgres_data`; keep that directory to retain the database, and do not remove it when stopping or recreating containers.
+- On an empty database, the application seeds sample doctors, patients, and appointments. Each sample group is seeded only when its table is empty. Do not treat this sample data as real patient information.
+- Gemini and Ollama model settings are in `src/main/resources/application-gemini.yaml` and `src/main/resources/application-ollama.yaml`. `application-remote.yaml` uses Gemini embeddings for both vector stores and indexes documents once; `application-local.yaml` additionally indexes an Ollama-specific collection using local Ollama embeddings. Chat requests use Gemini unless `model` is set to `ollama`.

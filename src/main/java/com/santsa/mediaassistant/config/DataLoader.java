@@ -36,6 +36,9 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void loadDoctors() {
+        if (doctorRepository.count() > 0) {
+            return;
+        }
         doctorRepository.saveAll(List.of(
                 Doctor.builder().firstName("Ana").lastName("Martinez").specialty("Cardiology")
                         .licenseNumber("MP-12345").phone("555-0101").office("Office 101").build(),
@@ -50,6 +53,9 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void loadAppointments() {
+        if (appointmentRepository.count() > 0) {
+            return;
+        }
         var today = LocalDate.now();
         var doctors = doctorRepository.findAll();
         LocalTime[] times = {
@@ -73,6 +79,9 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void loadPatients() {
+        if (patientRepository.count() > 0) {
+            return;
+        }
         patientRepository.saveAll(List.of(
                 Patient.builder().firstName("Gabriel").lastName("Example")
                         .dateOfBirth(LocalDate.of(1985, 3, 15))

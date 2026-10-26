@@ -8,3 +8,7 @@ spring:
           temperature: 0.2
           max-output-tokens: 2048
           top-p: 0.85
+        embedding:
+          api-key: ${GOOGLE_GENAI_API_KEY}
+          text:
+            model: gemini-embedding-001
