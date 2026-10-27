@@ -25,8 +25,8 @@ public class AppointmentBookingTool {
             "Ask confirmation before book.")
     public String bookAppointment(
             @ToolParam(description = "Medical speciality") String speciality,
-            @ToolParam(description = "Date of turn in format yyy-MM-dd") String date,
-            @ToolParam(description = "Hour of the turn in format HH:mm") String time,
+            @ToolParam(description = "Date of appointment in format yyy-MM-dd") String date,
+            @ToolParam(description = "Hour of the appointment in format HH:mm") String time,
             @ToolParam(description = "The unique identifier of the patient") Long patientId,
             ToolContext context // only admin
     ) {
@@ -35,8 +35,8 @@ public class AppointmentBookingTool {
 
         String role = context.getContext().get("role").toString();
         if (!"ADMIN".equals(role)) {
-            log.warn("Denied access: rol {} try to book turn", role);
-            return "Denied access. Only admin can book turns";
+            log.warn("Denied access: rol {} try to book appointment", role);
+            return "Denied access. Only admin can book appointments";
         }
         return appointmentService.bookAppointment(speciality, LocalDate.parse(date), LocalTime.parse(time), patientId);
     }

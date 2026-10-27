@@ -20,7 +20,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://expert-space-rotary-phone-rw4995vjg43xvgg-8090.app.github.dev/realms/medassistant
+          issuer-uri: https://haunted-spooky-wand-rw49955grvfr59-8090.app.github.dev/realms/medassistant
           #issuer-uri: http://localhost:8090/realms/medassistant
   ai:
     chat:
