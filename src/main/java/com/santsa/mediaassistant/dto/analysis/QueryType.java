@@ -2,7 +2,7 @@ package com.santsa.mediaassistant.dto.analysis;
 
 public enum QueryType {
     SYMPTOM_REPORT,
-    GENERAL_QUIESTION,
+    GENERAL_QUESTION,
     EMERGENCY,
     PRESCRIPTION_REQUEST,
     OFF_TOPIC
