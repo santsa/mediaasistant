@@ -10,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import com.santsa.mediaassistant.agent.AppointmentChainService;
 import com.santsa.mediaassistant.agent.RoutingWorkflowService;
+import com.santsa.mediaassistant.agent.orchestrator.OrchestratorService;
 import com.santsa.mediaassistant.dto.ChatRequest;
 
 import jakarta.validation.Valid;
@@ -24,6 +25,7 @@ public class agentController {
 
     private final AppointmentChainService appointmentChainService;
     private final RoutingWorkflowService routingWorkflowService;
+    private final OrchestratorService orchestratorService;
 
     @PostMapping("/chain/appointment")
     public ResponseEntity<String> bookAppointmentChain(
@@ -43,6 +45,16 @@ public class agentController {
 
         return ResponseEntity.ok(routingWorkflowService
                 .routeQuery(request.prompt(), request.model(), jwt.getClaim("userId")));
+    }
+
+    @PostMapping("/orchestrator")
+    public ResponseEntity<String> orchestrator(
+            @Valid @RequestBody ChatRequest request,
+            @AuthenticationPrincipal Jwt jwt,
+            Authentication authentication) {
+
+        return ResponseEntity.ok(orchestratorService
+                .orchestrate(request.prompt(), request.model(), jwt.getClaim("userId")));
     }
 
 }
