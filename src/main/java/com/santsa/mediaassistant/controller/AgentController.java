@@ -15,6 +15,7 @@ import com.santsa.mediaassistant.dto.ChatRequest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -69,6 +70,16 @@ public class AgentController {
                         @AuthenticationPrincipal Jwt jwt) {
 
                 return ResponseEntity.ok(appointmentChainService.cancelBooking(jwt.getClaim("userId")));
+        }
+
+        @PostMapping(value = "/orchestrator/progress", produces = "text/event-stream; charset=UTF-8")
+        public Flux<String> orchestratorWithProgress(
+                        @Valid @RequestBody ChatRequest request,
+                        @AuthenticationPrincipal Jwt jwt,
+                        Authentication authentication) {
+
+                return orchestratorService
+                                .orchestrateWithProgress(request.prompt(), request.model(), jwt.getClaim("userId"));
         }
 
 }
