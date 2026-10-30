@@ -47,3 +47,9 @@ SPRING_PROFILES_ACTIVE=gemini ./mvnw spring-boot:run -Dspring-boot.run.arguments
 
 docker compose -f /workspaces/mediaasistant/docker-compose.yml up -d --force-recreate postgres
 docker compose -f /workspaces/mediaasistant/docker-compose.yml ps -a && docker logs --tail 20 mediaassistant-db
+
+psql -U postgres -d  mediaassistant
+
+update appointments set date = date + 5;
+select * from doctors;
+select * from appointments where doctor_id = 1;

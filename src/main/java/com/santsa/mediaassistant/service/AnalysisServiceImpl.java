@@ -3,6 +3,7 @@ package com.santsa.mediaassistant.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,15 +81,15 @@ public class AnalysisServiceImpl implements AnalysisService {
     public QueryClassification classifyQuery(String query, String model, Long userId) {
         log.info("Classification of query - moedl: {}", model);
 
-        return clientResolver.resolve(model)
+        return ChatClient.create(clientResolver.resolveModel(model))
                 .prompt()
-                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, String.valueOf(userId)))
                 .user("Classify the following query of patient. " +
-                        "Determine type of query: symptom report, general question, emergency, prescription request, or off-topic."
+                        "Determine type of query. "
                         +
-                        "Provide a brief explanation of the classification result, providing context or reasoning behind the classification. "
+                        "Provide a brief explanation of the classification resul. "
                         +
-                        "Query: " + query)
+                        "Query of the patient: " + query)
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, String.valueOf(userId)))
                 .call()
                 .entity(QueryClassification.class);
     }
