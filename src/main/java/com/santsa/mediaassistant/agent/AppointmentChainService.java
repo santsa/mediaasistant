@@ -1,5 +1,10 @@
 package com.santsa.mediaassistant.agent;
 
 public interface AppointmentChainService {
-    String bookAppointmentChain(String userRequest, String model, Long UserId);
+
+    String bookAppointmentChain(String userRequest, String model, Long userId);
+
+    String confirmBooking(Long userId);
+
+    String cancelBooking(Long userId);
 }

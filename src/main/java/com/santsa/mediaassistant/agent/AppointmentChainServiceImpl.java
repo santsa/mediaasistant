@@ -1,6 +1,7 @@
 package com.santsa.mediaassistant.agent;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.santsa.mediaassistant.config.ClientResolver;
 import com.santsa.mediaassistant.dto.AppointmentInfo;
+import com.santsa.mediaassistant.dto.AppointmentSelection;
 import com.santsa.mediaassistant.dto.agent.AppointmentRequest;
 import com.santsa.mediaassistant.service.AppointmentService;
 
@@ -26,6 +28,7 @@ public class AppointmentChainServiceImpl implements AppointmentChainService {
 
     private final ClientResolver clientResolver;
     private final AppointmentService appointmentService;
+    private final PendingBookingStore pendingBookingStore;
 
     @Value("classpath:prompts/appointment-extraction.st")
     private Resource extractionResource;
@@ -48,7 +51,7 @@ public class AppointmentChainServiceImpl implements AppointmentChainService {
         AppointmentRequest extracted = interpret(userRequest, model);
         List<AppointmentInfo> available = search(extracted);
 
-        return confirm(userRequest, available, model);
+        return select(userRequest, available, model, UserId);
     }
 
     private AppointmentRequest interpret(String userRequest, String model) {
@@ -76,20 +79,81 @@ public class AppointmentChainServiceImpl implements AppointmentChainService {
         return available;
     }
 
-    private String confirm(String userRequest, List<AppointmentInfo> available, String model) {
+    private String select(String userRequest, List<AppointmentInfo> available,
+            String model, Long userId) {
+
+        if (available.isEmpty()) {
+            return "not found available appointments for this speciality and data. Should you try with other data";
+        }
+        AppointmentSelection selection = selectAppointment(userRequest, available, model);
+
+        pendingBookingStore.store(userId, selection);
+
+        return selection.message();
+    }
+
+    private AppointmentSelection selectAppointment(String userRequest, List<AppointmentInfo> available, String model) {
         String prompt = confirmationTemplate.render(Map.of(
                 "order", userRequest,
-                "appointments", available.isEmpty() ? "Not availables appointment" : available.toString()));
-
-        log.info("Chain step 3 - appointments send to the model: {}", available);
+                "appointments", available.toString()));
 
         return ChatClient.create(clientResolver.resolveModel(model))
                 .prompt()
-                .system("You are an assistant to manage medical appointments. You must response briefly and naturally.")
+                .system("You are a gestion assitant of medical appointments. " +
+                        "Select the best appointment and complete all fields")
                 .user(prompt)
                 .call()
-                .content();
+                .entity(AppointmentSelection.class);
+    }
 
+    @Override
+    public String confirmBooking(Long userId) {
+
+        AppointmentSelection selection = pendingBookingStore.remove(userId);
+
+        if (selection == null) {
+            return "You don't have any appointment pending to confirm";
+        }
+
+        if (!isStillAvailable(selection)) {
+            log.info("Not available apointment to userid={}: {} {} {}",
+                    userId, selection.specialty(), selection.date(), selection.time());
+            return "Selected appointment aren't available. Could you search other.";
+        }
+
+        return book(selection, userId);
+    }
+
+    private String book(AppointmentSelection selection, Long userId) {
+
+        String result = appointmentService.bookAppointment(
+                selection.specialty(),
+                LocalDate.parse(selection.date()),
+                LocalTime.parse(selection.time()),
+                userId);
+
+        log.info("Result to the booking: {}", result);
+        return result;
+    }
+
+    private boolean isStillAvailable(AppointmentSelection selection) {
+        List<AppointmentInfo> available = appointmentService.findAvailableAppointments(
+                selection.specialty(), LocalDate.parse(selection.date()));
+
+        return available.stream().anyMatch(a -> a.time().equals(selection.time()));
+    }
+
+    @Override
+    public String cancelBooking(Long userId) {
+        AppointmentSelection selection = pendingBookingStore.remove(userId);
+
+        if (selection == null) {
+            return "You don't have any appointment pending to cancel";
+        }
+
+        log.info("Cancelapointment to userid={}: {} {} {}",
+                userId, selection.specialty(), selection.date(), selection.time());
+        return "Appointment canceled. Could you search other.";
     }
 
 }
