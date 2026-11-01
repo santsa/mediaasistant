@@ -57,7 +57,7 @@ public class BibliographyWorker {
         }
 
         private List<Document> searchdocuments(String symptoms, String model) {
-                VectorStore vectorStore = clientResolver.resoleVectorStore(model);
+                VectorStore vectorStore = clientResolver.resolveVectorStore(model);
                 List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder()
                                 .query(symptoms)
                                 .similarityThreshold(0.7)

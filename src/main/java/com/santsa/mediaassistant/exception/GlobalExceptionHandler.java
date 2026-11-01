@@ -29,4 +29,11 @@ public class GlobalExceptionHandler {
                 .body("Invalid dateformat. Use yyyy-MM-dd.");
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.error("Invalid model: {}", ex.getMessage(), ex);
+        return ResponseEntity.badRequest()
+                .body(ex.getMessage());
+    }
+
 }

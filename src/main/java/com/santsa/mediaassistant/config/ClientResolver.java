@@ -21,6 +21,10 @@ public class ClientResolver {
 
     private final VectorStore ollamaVectorStore;
 
+    private static final String GEMINI = "gemini";
+
+    private static final String OLLAMA = "ollama";
+
     public ClientResolver(
             @Qualifier("geminiClient") ChatClient geminiClient,
             @Qualifier("ollamaClient") ChatClient ollamaClient,
@@ -37,15 +41,35 @@ public class ClientResolver {
     }
 
     public ChatClient resolve(String model) {
-        return "ollama".equalsIgnoreCase(model) ? ollamaClient : geminiClient;
+        return switch (normalize(model)) {
+            case GEMINI -> geminiClient;
+            case OLLAMA -> ollamaClient;
+            default -> throw new IllegalArgumentException(
+                    "Not supported model: '%s'. Valid values: gemini, ollama".formatted(model));
+        };
     }
 
     public ChatModel resolveModel(String model) {
-        return "ollama".equalsIgnoreCase(model) ? ollamaModel : geminiModel;
+        return switch (normalize(model)) {
+            case GEMINI -> geminiModel;
+            case OLLAMA -> ollamaModel;
+            default -> throw new IllegalArgumentException(
+                    "Not supported model: '%s'. Valid values: gemini, ollama".formatted(model));
+        };
     }
 
-    public VectorStore resoleVectorStore(String model) {
-        return "ollama".equalsIgnoreCase(model) ? ollamaVectorStore : googleVectorStore;
+    public VectorStore resolveVectorStore(String model) {
+        return switch (normalize(model)) {
+            case GEMINI -> googleVectorStore;
+            case OLLAMA -> ollamaVectorStore;
+            default -> throw new IllegalArgumentException(
+                    "Not supported model: '%s'. Valid values: gemini, ollama".formatted(model));
+        };
+    }
+
+    
+    private String normalize(String model) {
+        return model == null ? "gemini" : model.strip().toLowerCase();
     }
 
 }
