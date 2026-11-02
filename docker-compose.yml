@@ -9,7 +9,9 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - type: bind
+        source: ./postgres_data
+        target: /var/lib/postgresql/data
       - ./init-scripts:/docker-entrypoint-initdb.d
     networks:
       - medassistant-net
@@ -38,13 +40,12 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - IS_PERSISTENT=TRUE
+      IS_PERSISTENT: "TRUE"
+      PERSIST_DIRECTORY: /chroma/chroma
     volumes:
-      - ./chroma_data:/chroma/chroma      
-
-volumes:
-  mediaassistant-data:  
-  chroma_data:
+      - type: bind
+        source: ./chroma_data
+        target: /chroma/chroma
 
 networks:
   medassistant-net:

@@ -34,3 +34,14 @@ spring:
         url: http://localhost:8000
         #collection-name: medassistant
         #initialize-schema: true
+    mcp:
+      client:
+        stdio:
+          connections:
+            filesystem:
+              command: /home/codespace/nvm/current/bin/mcp-server-filesystem
+              args:
+                - "/workspaces/mediaasistant/src/main/resources/prompts"
+              env:
+                PATH: /home/codespace/nvm/current/bin:/usr/bin:/bin
+            
