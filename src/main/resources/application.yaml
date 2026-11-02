@@ -51,4 +51,7 @@ spring:
               env:
                 GITHUB_PERSONAL_ACCESS_TOKEN: ${MCP_GITHUB_TOKEN}
                 PATH: /home/codespace/nvm/current/bin:/usr/bin:/bin
-            
+      server:    
+        name: medassistant-mcp
+        version: 1.0.0
+        protocol: STATELESS
