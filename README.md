@@ -65,6 +65,7 @@ where mcp-server-github
 ```
 
 > npm may display a warning about version `2025.3.28`: the package no longer publishes date-based versions and recommends installing the latest semantic version. The warning does not necessarily mean the installation failed; check that `which` or `where` can find the executable.
+Set `GITHUB_PERSONAL_ACCESS_TOKEN` in the environment before starting the application. Do not commit the token to `application.yaml`.
 
 ## Run locally
 

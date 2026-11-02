@@ -44,4 +44,11 @@ spring:
                 - "/workspaces/mediaasistant/src/main/resources/prompts"
               env:
                 PATH: /home/codespace/nvm/current/bin:/usr/bin:/bin
+            github:
+              command: /home/codespace/nvm/current/bin/mcp-server-github
+              args:
+                - ""
+              env:
+                GITHUB_PERSONAL_ACCESS_TOKEN: ${MCP_GITHUB_TOKEN}
+                PATH: /home/codespace/nvm/current/bin:/usr/bin:/bin
             
