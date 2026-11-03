@@ -20,7 +20,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://haunted-spooky-wand-rw49955grvfr59-8090.app.github.dev/realms/medassistant
+          issuer-uri: https://solitary-cauldron-rxj9xwgj5359rg-8090.app.github.dev/realms/medassistant
           #issuer-uri: http://localhost:8090/realms/medassistant
   ai:
     chat:
@@ -34,3 +34,24 @@ spring:
         url: http://localhost:8000
         #collection-name: medassistant
         #initialize-schema: true
+    mcp:
+      client:
+        stdio:
+          connections:
+            filesystem:
+              command: /home/codespace/nvm/current/bin/mcp-server-filesystem
+              args:
+                - "/workspaces/mediaasistant/src/main/resources/prompts"
+              env:
+                PATH: /home/codespace/nvm/current/bin:/usr/bin:/bin
+            github:
+              command: /home/codespace/nvm/current/bin/mcp-server-github
+              args:
+                - ""
+              env:
+                GITHUB_PERSONAL_ACCESS_TOKEN: ${MCP_GITHUB_TOKEN}
+                PATH: /home/codespace/nvm/current/bin:/usr/bin:/bin
+      server:    
+        name: medassistant-mcp
+        version: 1.0.0
+        protocol: STATELESS
