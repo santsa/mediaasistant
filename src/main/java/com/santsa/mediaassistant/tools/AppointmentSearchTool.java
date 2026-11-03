@@ -3,6 +3,8 @@ package com.santsa.mediaassistant.tools;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.ai.mcp.annotation.McpTool;
+import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
@@ -20,9 +22,15 @@ public class AppointmentSearchTool {
     private final AppointmentService appointmentService;
 
     @Tool(description = "Search medical appointments available for a speciality and date. Using when user ask about medical appointments and medical slot availability.")
+    @McpTool(name = "search-appointments", 
+    description = "Search appointments availables for a speciality and date")
     public List<AppointmentInfo> searchAppointments(
-            @ToolParam(description = "The medical speciality to search for example: cardiology, neurology, pediatrics") String speciality,
-            @ToolParam(description = "The date to search for") String date) {
+            @ToolParam(description = "The medical speciality to search for example: cardiology, neurology, pediatrics") 
+            @McpToolParam(description = "Medical speciality ", required = true)
+            String speciality,
+            @ToolParam(description = "The date to search for in format yyyy-MM-dd") 
+            @McpToolParam(description = "Date to search in format yyyy-MM-dd", required = true)
+            String date) {
         log.info("Invoqued Searching appointments: for speciality: {} and date: {}", speciality, date);
         return appointmentService.findAvailableAppointments(speciality, LocalDate.parse(date));
     }
