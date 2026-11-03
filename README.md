@@ -65,7 +65,9 @@ where mcp-server-github
 ```
 
 > npm may display a warning about version `2025.3.28`: the package no longer publishes date-based versions and recommends installing the latest semantic version. The warning does not necessarily mean the installation failed; check that `which` or `where` can find the executable.
-Set `GITHUB_PERSONAL_ACCESS_TOKEN` in the environment before starting the application. Do not commit the token to `application.yaml`.
+Set `MCP_GITHUB_TOKEN` in the environment before starting the application; `application.yaml` reads this variable for the GitHub MCP server. Do not commit the token to `application.yaml`.
+
+The MCP server commands and arguments are configured under `spring.ai.mcp.client.stdio.connections` in `src/main/resources/application.yaml`. Replace the example absolute executable paths with the paths on your machine. The filesystem server's argument controls which directory it can access; keep it limited to files you intend to expose to the model.
 
 ## Run locally
 
@@ -157,6 +159,25 @@ Agent endpoints require the same authenticated request body as chat: a non-empty
 | `POST` | `/api/v1/agent/orchestrator/progress` | Run the same analysis and stream progress updates followed by the final response as server-sent events. |
 
 The appointment chain does not book the suggested slot until `/confirm` is called. Pending selections are held in application memory and are cleared if the application restarts.
+
+### MCP tools demo
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/api/v1/mcp/demo` | Send a prompt to the selected chat model with the configured MCP tools available. |
+
+`McpDemoController` resolves the requested model, passes the prompt and the injected `ToolCallbackProvider` to Spring AI's `ChatClient`, and returns the model's response. The provider supplies the tool callbacks discovered from the configured MCP servers (for example, filesystem and GitHub). The model may call those tools while producing its response. `ToolCallbackProvider` is a Spring AI interface; its `from(...)` factory methods create a provider from callbacks directly, while this controller uses the provider supplied by Spring's dependency injection.
+
+The request uses the standard chat body and authentication described above. For example:
+
+```sh
+curl http://localhost:8080/api/v1/mcp/demo \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"List the available files","model":"gemini"}'
+```
+
+The available tools depend on which MCP servers are configured and running. Treat the filesystem directory and GitHub token as sensitive: the model can use the configured tools to access the resources they grant.
 
 ### Document ingestion
 
