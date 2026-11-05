@@ -11,12 +11,14 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/v1/mcp")
+@Profile("!aws")
 @RequiredArgsConstructor
 public class McpDemoController {
 

@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.santsa.mediaassistant.dto.IngestionResult;
 import com.santsa.mediaassistant.service.DocumentIngestionService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class DocumentController {
 
     @PostMapping("/ingest")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> ingestDocument(
+    public ResponseEntity<IngestionResult> ingestDocument(
             @RequestParam("file") MultipartFile file) {
         return ResponseEntity.ok(documentIngestionService.ingestNewDocument(file.getResource()));
     }

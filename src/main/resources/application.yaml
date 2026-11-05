@@ -6,9 +6,12 @@ spring:
     name: mediaassistant
   profiles:
     include:
-      - ollama
-      - gemini
-      - remote
+      # - aws
+      # for local development or devtools in github, you can use the following profiles to enable different vector stores:
+      # - ollama
+      # - gemini
+      # - remote #in dev tools
+      # - local #in local computer
   datasource:
     url: jdbc:postgresql://localhost:5432/mediaassistant
     username: postgres
