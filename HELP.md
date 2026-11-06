@@ -53,3 +53,39 @@ psql -U postgres -d  mediaassistant
 update appointments set date = date + 5;
 select * from doctors;
 select * from appointments where doctor_id = 1;
+
+# test env aws test
+
+docker compose -f docker-compose.aws-test.yml up -d
+docker build -t medassistant:aws .
+docker images head
+export GOOGLE_GENAI_API_KEY="xxxxxxx"
+docker run -d \
+  --name medassistant \
+  --add-host=host.docker.internal:host-gateway \
+  -p 8080:8080 \
+  -e RDS_HOST=host.docker.internal \
+  -e RDS_PORT=5434 \
+  -e RDS_DB=medassistant_prod \
+  -e RDS_USERNAME=postgres \
+  -e RDS_PASSWORD=postgres \
+  -e KEYCLOAK_ISSUER_URI=http://host.docker.internal:8090/realms/medassistant \
+  -e GOOGLE_GENAI_API_KEY \
+  medassistant:aws
+
+docker run -d \
+  --name medassistant \
+  --add-host=host.docker.internal:host-gateway \
+  -p 8080:8080 \
+  -e RDS_HOST=host.docker.internal \
+  -e RDS_PORT=5434 \
+  -e RDS_DB=medassistant_prod \
+  -e RDS_USERNAME=postgres \
+  -e RDS_PASSWORD=postgres \
+  -e KEYCLOAK_ISSUER_URI=https://solid-memory-v9rvjjpx2wgw5-8090.app.github.dev/realms/medassistant \
+  -e GOOGLE_GENAI_API_KEY \
+  medassistant:aws  
+
+docker logs -f medassistant  
+
+
