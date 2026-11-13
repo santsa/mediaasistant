@@ -86,6 +86,26 @@ docker run -d \
   -e GOOGLE_GENAI_API_KEY \
   medassistant:aws  
 
-docker logs -f medassistant  
+docker logs -f medassistant
+
+## aws
+ecr create repository
+iam Dashboards -> my security credentials -> access key
+aws configure
+Aws access key id xxxx
+Aws Secret Access key xxxxx
+
+aws sts get-caller-identity
+
+auth
+aws ecr get-login-password --region eu-south-2 | docker login --username AWS --password-stdin awsAccountId.dkr.ecr.eu-south-2.amazonaws.com
+
+tag
+docker tag medassistant:aws awsAccountId.dkr.ecr.eu-south-2.amazonaws.com/medassistant:latest
+
+publish in ecr
+docker push awsAccountId.dkr.ecr.eu-south-2.amazonaws.com/medassistant:latest
+
+postgres:awsAccountId
 
 

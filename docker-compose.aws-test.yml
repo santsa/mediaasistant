@@ -31,7 +31,8 @@ services:
     ports:
       - "8090:8080"
     volumes:
-      - ./keycloak_data:/opt/keycloak/data/
+      # - ./keycloak_data:/opt/keycloak/data/
+      - ./keycloak_realm:/opt/keycloak/data/import:ro
     networks:
       - medassistant-net
 
