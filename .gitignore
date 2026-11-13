@@ -33,3 +33,14 @@ build/
 
 ### Docker ###
 postgres_data/
+
+### Terraform ###
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+orders.txt
+
+
+### Keycloak ###
+keycloak_data/
