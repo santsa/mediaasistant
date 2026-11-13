@@ -9,15 +9,19 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+
+import com.santsa.mediaassistant.dto.IngestionResult;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Profile("!aws")
 @Slf4j
-public class DocumentIngestionServiceImpl implements DocumentIngestionService{
+public class DocumentIngestionServiceDefaultImpl implements DocumentIngestionService{
 
     private static final int CHUNK_SIZE = 800;
     private static final int MAX_CHUNKS = 1000;
@@ -28,7 +32,7 @@ public class DocumentIngestionServiceImpl implements DocumentIngestionService{
     private final boolean geminiIngestionEnabled;
     private final List<Resource> initialDocuments;
 
-    public DocumentIngestionServiceImpl(
+    public DocumentIngestionServiceDefaultImpl(
             @Qualifier("googleVectorStore") VectorStore googleVectorStore,
             @Qualifier("ollamaVectorStore") VectorStore ollamaVectorStore,
             @Value("${assistant.ingestion.ollama-enabled}") boolean ollamaIngestionEnabled,
@@ -53,14 +57,9 @@ public class DocumentIngestionServiceImpl implements DocumentIngestionService{
         ingestDocuments(readDocuments(initialDocuments));
     }
 
-    private List<Document> readDocument(Resource resource) {
-        log.info("Reading document: {}", resource.getFilename());
-        return new TikaDocumentReader(resource).get();
-    }
-
     private List<Document> readDocuments(List<Resource> resources) {
         return resources.stream()
-                .flatMap(resource -> readDocument(resource).stream())
+                .flatMap(resource -> new TikaDocumentReader(resource).get().stream())
                 .toList();
     }
 
@@ -108,8 +107,8 @@ public class DocumentIngestionServiceImpl implements DocumentIngestionService{
     }
 
     @Override
-    public String ingestNewDocument(Resource resource) {
-        List<Document> chunks = ingestDocuments(readDocument(resource));
-        return "Ingest '%s' documents: %d fragments".formatted(resource.getFilename(), chunks.size());
+    public IngestionResult ingestNewDocument(Resource resource) {
+        List<Document> chunks = ingestDocuments(new TikaDocumentReader(resource).get());
+        return new IngestionResult(resource.getFilename(), chunks.size());
     }
 }

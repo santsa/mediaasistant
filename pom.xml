@@ -17,6 +17,12 @@
 		<spring-ai.version>2.0.1</spring-ai.version>
 	</properties>
 	<dependencies>
+	<!-- for AWS -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
+		</dependency>
+	<!-- for AWS -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>

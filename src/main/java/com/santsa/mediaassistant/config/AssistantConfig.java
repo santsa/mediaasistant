@@ -38,6 +38,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 
 @Configuration
+@Profile ("!aws")
 @RequiredArgsConstructor
 public class AssistantConfig {
 

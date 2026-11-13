@@ -2,6 +2,8 @@ package com.santsa.mediaassistant.service;
 
 import org.springframework.core.io.Resource;
 
+import com.santsa.mediaassistant.dto.IngestionResult;
+
 public interface DocumentIngestionService {
-    String ingestNewDocument(Resource resource);
+    IngestionResult ingestNewDocument(Resource resource);
 }

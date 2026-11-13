@@ -1,0 +1,56 @@
+services:
+
+  postgres-app:
+    image: postgres:17
+    container_name: mediaassistant-db
+    environment:
+      POSTGRES_DB: mediaassistant
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - type: bind
+        source: ./postgres_data
+        target: /var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - medassistant-net
+
+  keycloak:
+    image: keycloak/keycloak:26.2.5
+    container_name: medassistant-keycloak
+    command: start-dev --import-realm
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_PROXY_HEADERS: "xforwarded"
+    ports:
+      - "8090:8080"
+    volumes:
+      # - ./keycloak_data:/opt/keycloak/data/
+      - ./keycloak_realm:/opt/keycloak/data/import:ro
+    networks:
+      - medassistant-net
+
+  pgvector:
+    image: pgvector/pgvector:pg17
+    container_name: medassistant-pgvector-aws
+    environment:
+      POSTGRES_DB: medassistant_prod
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgvector-aws-data:/var/lib/postgresql/data
+
+volumes:
+  pgvector-aws-data:
+
+networks:
+  medassistant-net:
+    driver: bridge  
