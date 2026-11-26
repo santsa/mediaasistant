@@ -28,6 +28,7 @@ public class DocumentIngestionServiceAwsImpl implements DocumentIngestionService
 
     private final VectorStore googleVectorStore;
     private final List<Resource> initialDocuments;
+    private final boolean geminiIngestionEnabled;
 
     public DocumentIngestionServiceAwsImpl(
             @Qualifier("googleVectorStore") VectorStore googleVectorStore,
@@ -36,25 +37,37 @@ public class DocumentIngestionServiceAwsImpl implements DocumentIngestionService
             @Value("classpath:docs/cardiovascular-care-protocol.pdf") Resource cardiovascular,
             @Value("classpath:docs/hipertension-guide-medassistant.pdf") Resource hypertension) {
         this.googleVectorStore = googleVectorStore;
+        this.geminiIngestionEnabled = geminiIngestionEnabled;
         this.initialDocuments = List.of(ibuprofen, cardiovascular, hypertension);
     }
 
     @PostConstruct
     public void ingest() {
-        ingestDocuments(readDocuments(initialDocuments));
+        if (!geminiIngestionEnabled) {
+            log.info("Medical document ingestion is disabled for Gemini");
+            return;
+        }
+        ingestDocuments(readDocuments(initialDocuments), true);
     }
 
     @Override
     public IngestionResult ingestNewDocument(Resource resource) {
-        List<Document> documents = new TikaDocumentReader(resource).get();
-        ingestDocuments(documents);
-        return new IngestionResult(resource.getFilename(), documents.size());
+        if (!geminiIngestionEnabled) {
+            log.info("Medical document ingestion is disabled for Gemini");
+            return new IngestionResult(resource.getFilename(), 0);
+        }
+        List<Document> chunks = ingestDocuments(new TikaDocumentReader(resource).get(), false);
+        return new IngestionResult(resource.getFilename(), chunks.size());
     }
 
-    private List<Document> ingestDocuments(List<Document> documents) {
+    /**
+     * @param skipIfStoreNotEmpty true for the startup load (don't re-index the initial PDFs on every boot);
+     *                            false for documents uploaded at runtime, which must always be added.
+     */
+    private List<Document> ingestDocuments(List<Document> documents, boolean skipIfStoreNotEmpty) {
         log.info("Starting medical document ingestion");
         List<Document> chunks = splitDocuments(documents);
-        ingestToStore(googleVectorStore, "Gemini", chunks);
+        ingestToStore(googleVectorStore, "Gemini", chunks, skipIfStoreNotEmpty);
         log.info("Finished medical document ingestion");
         return chunks;
     }
@@ -70,8 +83,9 @@ public class DocumentIngestionServiceAwsImpl implements DocumentIngestionService
     private void ingestToStore(
             VectorStore vectorStore,
             String provider,
-            List<Document> chunks) {
-        if (isIngested(vectorStore)) {
+            List<Document> chunks,
+            boolean skipIfStoreNotEmpty) {
+        if (skipIfStoreNotEmpty && isIngested(vectorStore)) {
             log.info("Documents already exist in {} vector store; skipping ingestion", provider);
             return;
         }

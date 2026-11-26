@@ -46,7 +46,7 @@ public class OpenAgentServiceImpl implements OpenAgentService {
 
     @Override
     public String execute(String query, String model, Long userid) {
-        log.info("Open Agent - query: {}, query");
+        log.info("Open Agent - query: {}", query);
 
         String systemPrompt = agentTemplate.render(Map.of(
                 "currentDate", LocalDate.now().toString()));

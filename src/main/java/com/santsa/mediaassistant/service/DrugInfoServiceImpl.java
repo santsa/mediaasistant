@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import com.santsa.mediaassistant.dto.DrugInfo;
@@ -37,15 +38,21 @@ public class DrugInfoServiceImpl implements DrugInfoService {
     }
 
     private Map<String, Object> fetchFromOpenFda(String drugName) {
-        return openFdaClient.get()
-                .uri("/drug/label.json?search=openfda.generic_name:{drugName}&limit=1", drugName)
-                .retrieve()
-                .body(new ParameterizedTypeReference<>() {
-                });
+        try {
+            return openFdaClient.get()
+                    .uri("/drug/label.json?search=openfda.generic_name:{drugName}&limit=1", drugName)
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<>() {
+                    });
+        } catch (HttpClientErrorException.NotFound e) {
+            // OpenFDA answers 404 when no label matches: that means "unknown drug", not an outage.
+            log.warn("OpenFDA has no label for drug: {}", drugName);
+            return null;
+        }
     }
 
     private DrugInfo mapToDrugInfo(Map<String, Object> response, String drugName) {
-        if (!(response.get("results") instanceof List<?> results) || response.isEmpty()) {
+        if (response == null || !(response.get("results") instanceof List<?> results) || results.isEmpty()) {
             log.warn("No results found for drug: {}", drugName);
             return null;
         }

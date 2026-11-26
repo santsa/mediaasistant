@@ -16,6 +16,8 @@ import com.santsa.mediaassistant.dto.analysis.SymptomAnalysis;
 import com.santsa.mediaassistant.dto.ChatRequest;
 import com.santsa.mediaassistant.service.AnalysisService;
 
+import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,7 +29,7 @@ public class AnalysisController {
 
     @PostMapping("/condition")
     public ResponseEntity<ConditionSummary> analyzeCondition(
-            @RequestBody ChatRequest chatRequest,
+            @Valid @RequestBody ChatRequest chatRequest,
             @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(
                 analysisService.summarizeCondition(chatRequest.prompt(), chatRequest.model(), jwt.getClaim("userId")));
@@ -35,7 +37,7 @@ public class AnalysisController {
 
     @PostMapping("/conditions")
     public ResponseEntity<List<ConditionSummary>> listConditions(
-            @RequestBody ChatRequest chatRequest,
+            @Valid @RequestBody ChatRequest chatRequest,
             @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(analysisService.listRelatedConditions(chatRequest.prompt(), chatRequest.model(),
                 jwt.getClaim("userId")));
@@ -43,7 +45,7 @@ public class AnalysisController {
 
     @PostMapping("/symptoms")
     public ResponseEntity<SymptomAnalysis> analyzeSymptoms(
-            @RequestBody ChatRequest chatRequest,
+            @Valid @RequestBody ChatRequest chatRequest,
             @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity
                 .ok(analysisService.analyzeSymptoms(chatRequest.prompt(), chatRequest.model(), jwt.getClaim("userId")));
@@ -51,7 +53,7 @@ public class AnalysisController {
 
     @PostMapping("/classify")
     public ResponseEntity<QueryClassification> classify(
-            @RequestBody ChatRequest chatRequest,
+            @Valid @RequestBody ChatRequest chatRequest,
             @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity
                 .ok(analysisService.classifyQuery(chatRequest.prompt(), chatRequest.model(), jwt.getClaim("userId")));

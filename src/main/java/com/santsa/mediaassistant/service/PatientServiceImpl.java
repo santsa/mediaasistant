@@ -30,7 +30,7 @@ public class PatientServiceImpl implements PatientService {
         return new PatientInfo(
                 patient.getFirstName(),
                 patient.getLastName(),
-                patient.getDateOfBirth().toString(),
+                patient.getDateOfBirth() != null ? patient.getDateOfBirth().toString() : null,
                 patient.getAllergies(),
                 patient.getConditions());
     }

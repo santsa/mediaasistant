@@ -33,7 +33,8 @@ public class AppointmentBookingTool {
         log.info("Invoqued Searching bookAppointment: for speciality: {}, date: {}, time: {} and patientId: {}",
                 speciality, date, time, patientId);
 
-        String role = context.getContext().get("role").toString();
+        // A missing role must deny, not throw.
+        String role = String.valueOf(context.getContext().get("role"));
         if (!"ADMIN".equals(role)) {
             log.warn("Denied access: rol {} try to book appointment", role);
             return "Denied access. Only admin can book appointments";
