@@ -23,9 +23,9 @@ public class HistoryWorker {
         }
 
         String result = String.format(
-                "Patient; %% | Date of birth: %s | Alergies: %s | Conditions: %s",
+                "Patient: %s %s | Date of birth: %s | Alergies: %s | Conditions: %s",
                 patientInfo.firstName(), patientInfo.lastName(),
-                patientInfo.dateOfBirth(),
+                patientInfo.dateOfBirth() != null ? patientInfo.dateOfBirth() : "Not registered",
                 patientInfo.allergies() != null ? patientInfo.allergies() : "Not registered",
                 patientInfo.conditions() != null ? patientInfo.conditions() : "Not registered");
 

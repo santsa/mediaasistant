@@ -54,7 +54,7 @@ public class DocumentIngestionServiceDefaultImpl implements DocumentIngestionSer
             return;
         }
 
-        ingestDocuments(readDocuments(initialDocuments));
+        ingestDocuments(readDocuments(initialDocuments), true);
     }
 
     private List<Document> readDocuments(List<Resource> resources) {
@@ -71,11 +71,15 @@ public class DocumentIngestionServiceDefaultImpl implements DocumentIngestionSer
         return splitter.apply(documents);
     }
 
-    private List<Document> ingestDocuments(List<Document> documents) {
+    /**
+     * @param skipIfStoreNotEmpty true for the startup load (don't re-index the initial PDFs on every boot);
+     *                            false for documents uploaded at runtime, which must always be added.
+     */
+    private List<Document> ingestDocuments(List<Document> documents, boolean skipIfStoreNotEmpty) {
         log.info("Starting medical document ingestion");
         List<Document> chunks = splitDocuments(documents);
-        ingestToStore(googleVectorStore, geminiIngestionEnabled, "Gemini", chunks);
-        ingestToStore(ollamaVectorStore, ollamaIngestionEnabled, "Ollama", chunks);
+        ingestToStore(googleVectorStore, geminiIngestionEnabled, "Gemini", chunks, skipIfStoreNotEmpty);
+        ingestToStore(ollamaVectorStore, ollamaIngestionEnabled, "Ollama", chunks, skipIfStoreNotEmpty);
         log.info("Finished medical document ingestion");
         return chunks;
     }
@@ -84,12 +88,13 @@ public class DocumentIngestionServiceDefaultImpl implements DocumentIngestionSer
             VectorStore vectorStore,
             boolean enabled,
             String provider,
-            List<Document> chunks) {
+            List<Document> chunks,
+            boolean skipIfStoreNotEmpty) {
         if (!enabled) {
             log.info("Medical document ingestion is disabled for {}", provider);
             return;
         }
-        if (isIngested(vectorStore)) {
+        if (skipIfStoreNotEmpty && isIngested(vectorStore)) {
             log.info("Documents already exist in {} vector store; skipping ingestion", provider);
             return;
         }
@@ -108,7 +113,7 @@ public class DocumentIngestionServiceDefaultImpl implements DocumentIngestionSer
 
     @Override
     public IngestionResult ingestNewDocument(Resource resource) {
-        List<Document> chunks = ingestDocuments(new TikaDocumentReader(resource).get());
+        List<Document> chunks = ingestDocuments(new TikaDocumentReader(resource).get(), false);
         return new IngestionResult(resource.getFilename(), chunks.size());
     }
 }

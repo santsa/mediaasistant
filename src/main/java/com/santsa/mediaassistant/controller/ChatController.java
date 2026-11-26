@@ -29,7 +29,7 @@ public class ChatController {
 
     @PostMapping("/chat")
     public ResponseEntity<String> chat(
-            @RequestBody ChatRequest chatRequest,
+            @Valid @RequestBody ChatRequest chatRequest,
             @AuthenticationPrincipal Jwt jwt,
             Authentication authentication) {
         Long userId = jwt.getClaim("userId");
@@ -39,7 +39,7 @@ public class ChatController {
 
     @PostMapping(value = "/stream", produces = "text/event-stream; charset=UTF-8")
     public Flux<String> stream(
-            @RequestBody ChatRequest chatRequest,
+            @Valid @RequestBody ChatRequest chatRequest,
             @AuthenticationPrincipal Jwt jwt,
             Authentication authentication) {
         Long userId = jwt.getClaim("userId");

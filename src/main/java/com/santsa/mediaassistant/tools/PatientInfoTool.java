@@ -27,7 +27,8 @@ public class PatientInfoTool {
         Long userId = (Long) context.getContext().get("userId");
         log.info("ToolContext User ID: {}", userId);
 
-        if (!patientId.equals(userId)) {
+        // Only the patient themself may read their data (ADMIN included: by design it cannot).
+        if (patientId == null || !patientId.equals(userId)) {
             log.warn("Unauthorized access attempt by userId: {} for patientId: {}", userId, patientId);
             return null; // or throw an exception, or return an error message
         }
